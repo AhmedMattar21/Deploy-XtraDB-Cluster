@@ -1,0 +1,64 @@
+---
+# Play-1: Configuring the Master Node
+- name: Installing XtraDB
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: Install necessary packages
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - wget
+          - gnupg2
+          - lsb-release
+          - curl
+        state: present
+
+    - name: Download the repository package
+      ansible.builtin.get_url:
+        url: https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+        dest: /tmp/download/xtraDB
+        mode: "0755" 
+
+
+    - name: Install the package
+      ansible.builtin.apt:
+        deb: /tmp/download/xtraDB/percona-release_latest.generic_all.deb
+
+
+    - name: Refresh the local cache to update the package information
+      register: sysupdate
+      ansible.builtin.apt:
+        update_cache: true
+
+
+    - name: Display the last line of the previous task to check the stats
+      ansible.builtin.debug:
+        msg: "{{ sysupdate.stdout_lines | last }}"
+
+
+    - name: Enable the release repository for Percona XtraDB Cluster
+      ansible.builtin.shell:
+        cmd: percona-release setup pxc80
+
+
+    - name: Install the XtraDB Cluster
+      ansible.builtin.apt:
+        name:
+          - percona-xtradb-cluster
+        state: latest
+
+
+---
+# Play-2: Bootstrap the first Node
+- name: Bootstrap the first Node
+  hosts: master
+  become: true
+  become_user: root
+  tasks:
+    - name: Configuring the first Node
+      ansible.builtin.lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysql.cfg
+        regexp: '^=gcomm://'
+        line: 192.168.1.122,192.168.1.123,192.168.1.124
