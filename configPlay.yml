@@ -48,6 +48,7 @@
         regexp: '^wsrep_node_name=pxc-n1'
         line: '# wsrep_node_name=pxc-n1'
 
+
     - name: Bootstrap the first node
       ansible.builtin.service:
         name: mysql@bootstrap
