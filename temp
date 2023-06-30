@@ -52,22 +52,9 @@
   hosts: master
   become: true
   become_user: root
-  vars_files: 
+  vars_files:
     - vars.yml
   tasks:
-    - name: Create a directory if it does not exist
-      file:
-        path: /etc/mysql/certs/
-        state: directory
-        owner: mysql
-        group: mysql 
-        mode: '2440'
-    
-    - name: copy a file from remote machine to remote machine
-      copy:
-        src: /var/
-        dest: /etc/dest.txt
-
     - name: Adding Nodes IPs
       ansible.builtin.lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf 
@@ -116,7 +103,7 @@
         state: started
 
 
-# Play-3: Configure other nodes
+# Play-3: Bootstrap the first Node
 - name: Join other Nodes
   hosts: node
   become: true
@@ -126,14 +113,14 @@
   tasks:
     - name: Adding Nodes IPss
       ansible.builtin.lineinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf 
+      - path: /etc/mysql/mysql.conf.d/mysqld.cnf 
         regexp: '^wsrep_cluster_address=gcomm://'
         insertafter: 'wsrep_cluster_address=gcomm://'
         line: wsrep_cluster_address=gcomm://{{ cluster_hosts }}
 
     - name: Disable Traffic Encryption
       ansible.builtin.blockinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf 
+      - path: /etc/mysql/mysql.conf.d/mysqld.cnf 
         block: |
           # Disable Traffic Encryption
           pxc-encrypt-cluster-traffic=OFF
@@ -147,26 +134,26 @@
 
     - name: Set Node IP Address
       ansible.builtin.lineinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf  
+      - path: /etc/mysql/mysql.conf.d/mysqld.cnf  
         regexp: '^wsrep_node_address='
         line: wsrep_node_address={{ target_ip["ansible_default_ipv4.address"] }}
 
 
     - name: Set Cluster Name
       ansible.builtin.lineinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf 
+      - path: /etc/mysql/mysql.conf.d/mysqld.cnf 
         regexp: '^wsrep_cluster_name='
         line: wsrep_cluster_name={{ cluster_name }}
 
 
     - name: Comment WSREP node name to use node's hostname
       ansible.builtin.lineinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf 
+      - path: /etc/mysql/mysql.conf.d/mysqld.cnf 
         regexp: '^wsrep_node_name='
         line: '# wsrep_node_name='
 
 
     - name: Run Mysql Service
       ansible.builtin.service:
-        name: mysql
+      - name: mysql
         state: started

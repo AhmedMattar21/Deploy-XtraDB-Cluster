@@ -3,5 +3,3 @@ cluster_hosts: '192.168.1.221,192.168.1.222,192.168.1.223'
 
 # ADD ANY NAME U WANT
 cluster_name: 'magic-cluster'
-
-# cluster_hosts: ['192.168.1.1', '192.168.1.2']

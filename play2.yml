@@ -1,0 +1,7 @@
+---
+- name: Join other Nodes
+  hosts: all
+  become: true
+  become_user: root
+  roles:
+    - bootstrapZfirstNode
