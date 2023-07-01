@@ -1,0 +1,244 @@
+
+PLAY [XtraDB Cluster] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.1.223]
+ok: [192.168.1.222]
+ok: [192.168.1.221]
+
+TASK [Check if the key exists] *************************************************
+ok: [192.168.1.223]
+ok: [192.168.1.222]
+ok: [192.168.1.221]
+
+TASK [Task name] ***************************************************************
+skipping: [192.168.1.221]
+skipping: [192.168.1.222]
+skipping: [192.168.1.223]
+
+TASK [Generate SSH key for the first node] *************************************
+skipping: [192.168.1.222]
+skipping: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [Fetch Public key to the master] ******************************************
+skipping: [192.168.1.222]
+skipping: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [Copy the file from master to destination] ********************************
+skipping: [192.168.1.221]
+changed: [192.168.1.223]
+changed: [192.168.1.222]
+
+TASK [add the public key into Authorized_keys file to enable Key Auth] *********
+skipping: [192.168.1.221]
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+
+TASK [common : Install necessary packages] *************************************
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [common : Download the percona xtradb repository deb package] *************
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [common : Install the package] ********************************************
+changed: [192.168.1.223]
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+
+TASK [common : Update apt repository] ******************************************
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+
+TASK [common : Display previous output to check the stats] *********************
+ok: [192.168.1.221] => {
+    "msg": {
+        "cache_update_time": 1688215993,
+        "cache_updated": true,
+        "changed": true,
+        "failed": false
+    }
+}
+ok: [192.168.1.222] => {
+    "msg": {
+        "cache_update_time": 1688215994,
+        "cache_updated": true,
+        "changed": true,
+        "failed": false
+    }
+}
+ok: [192.168.1.223] => {
+    "msg": {
+        "cache_update_time": 1688215994,
+        "cache_updated": true,
+        "changed": true,
+        "failed": false
+    }
+}
+
+TASK [common : Enable the release repository for Percona XtraDB Cluster] *******
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+
+TASK [common : Install the XtraDB Cluster] *************************************
+changed: [192.168.1.222]
+changed: [192.168.1.221]
+changed: [192.168.1.223]
+
+TASK [common : Create a directory for CERTs if it does not exist] **************
+changed: [192.168.1.221]
+changed: [192.168.1.223]
+changed: [192.168.1.222]
+
+TASK [common : Compress CERTs for sending them to other nodes] *****************
+skipping: [192.168.1.222]
+skipping: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [common : Copy the certs securly via Synchronize] *************************
+ok: [192.168.1.221] => (item=/etc/mysql/certs/certs.tar)
+changed: [192.168.1.223 -> 192.168.1.221] => (item=/etc/mysql/certs/certs.tar)
+changed: [192.168.1.222 -> 192.168.1.221] => (item=/etc/mysql/certs/certs.tar)
+
+TASK [common : Unarchive CERTs archive] ****************************************
+changed: [192.168.1.223]
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+
+TASK [common : Set permissions] ************************************************
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+
+TASK [common : Generate id for server] *****************************************
+ok: [192.168.1.221]
+ok: [192.168.1.222]
+ok: [192.168.1.223]
+
+TASK [common : debug] **********************************************************
+ok: [192.168.1.221] => {
+    "ansible_nodename[-1]": "1"
+}
+ok: [192.168.1.222] => {
+    "ansible_nodename[-1]": "2"
+}
+ok: [192.168.1.223] => {
+    "ansible_nodename[-1]": "3"
+}
+
+TASK [common : Generate configuration file from template] **********************
+changed: [192.168.1.221]
+changed: [192.168.1.222]
+changed: [192.168.1.223]
+
+TASK [common : Stop mysql servers] *********************************************
+ok: [192.168.1.222]
+ok: [192.168.1.221]
+ok: [192.168.1.223]
+
+TASK [common : Bootstrap mysql on the first node] ******************************
+skipping: [192.168.1.222]
+skipping: [192.168.1.223]
+changed: [192.168.1.221]
+
+TASK [common : Get errors logs] ************************************************
+changed: [192.168.1.223]
+changed: [192.168.1.222]
+changed: [192.168.1.221]
+
+TASK [common : debug] **********************************************************
+ok: [192.168.1.221] => {
+    "logs['stdout_lines']": [
+        "2023-07-01T12:59:46.250578Z 8 [Note] [MY-000000] [WSREP] Recovered cluster id 165f83d2-180f-11ee-8c9f-8ea3ec8adc39",
+        "2023-07-01T12:59:46.253100Z 1 [Note] [MY-000000] [WSREP] Server status change initialized -> joined",
+        "2023-07-01T12:59:46.253121Z 1 [Note] [MY-000000] [WSREP] wsrep_notify_cmd is not defined, skipping notification.",
+        "2023-07-01T12:59:46.253167Z 1 [Note] [MY-000000] [WSREP] wsrep_notify_cmd is not defined, skipping notification.",
+        "2023-07-01T12:59:46.258547Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock",
+        "2023-07-01T12:59:46.258726Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.32-24.2'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  Percona XtraDB Cluster (GPL), Release rel24, Revision 2119e75, WSREP version 26.1.4.3.",
+        "2023-07-01T12:59:46.259102Z 11 [Note] [MY-000000] [WSREP] Starting applier thread 11",
+        "2023-07-01T12:59:46.259184Z 1 [Note] [MY-000000] [Galera] Recording CC from group: 2",
+        "2023-07-01T12:59:46.259214Z 1 [Note] [MY-000000] [Galera] Lowest cert index boundary for CC from group: 2",
+        "2023-07-01T12:59:46.259224Z 1 [Note] [MY-000000] [Galera] Min available from gcache for CC from group: 1",
+        "2023-07-01T12:59:46.259243Z 1 [Note] [MY-000000] [Galera] Server pxc-fn1 synced with group",
+        "2023-07-01T12:59:46.259250Z 1 [Note] [MY-000000] [WSREP] Server status change joined -> synced",
+        "2023-07-01T12:59:46.259255Z 1 [Note] [MY-000000] [WSREP] Synchronized with group, ready for connections",
+        "2023-07-01T12:59:46.259261Z 1 [Note] [MY-000000] [WSREP] wsrep_notify_cmd is not defined, skipping notification.",
+        "2023-07-01T12:59:46.259339Z 12 [Note] [MY-000000] [WSREP] Starting applier thread 12",
+        "2023-07-01T12:59:46.259441Z 13 [Note] [MY-000000] [WSREP] Starting applier thread 13",
+        "2023-07-01T12:59:46.259593Z 14 [Note] [MY-000000] [WSREP] Starting applier thread 14",
+        "2023-07-01T12:59:46.259694Z 15 [Note] [MY-000000] [WSREP] Starting applier thread 15",
+        "2023-07-01T12:59:46.259789Z 16 [Note] [MY-000000] [WSREP] Starting applier thread 16",
+        "2023-07-01T12:59:46.259910Z 17 [Note] [MY-000000] [WSREP] Starting applier thread 17"
+    ]
+}
+ok: [192.168.1.222] => {
+    "logs['stdout_lines']": [
+        "2023-07-01T12:59:08.996287Z 0 [Note] [MY-000000] [Galera] apply mon: entered 0",
+        "2023-07-01T12:59:08.999141Z 0 [Note] [MY-000000] [Galera] mon: entered 3 oooe fraction 0 oool fraction 0",
+        "2023-07-01T12:59:08.999190Z 0 [Note] [MY-000000] [Galera] cert index usage at exit 0",
+        "2023-07-01T12:59:08.999202Z 0 [Note] [MY-000000] [Galera] cert trx map usage at exit 0",
+        "2023-07-01T12:59:08.999211Z 0 [Note] [MY-000000] [Galera] deps set usage at exit 0",
+        "2023-07-01T12:59:08.999222Z 0 [Note] [MY-000000] [Galera] avg deps dist 0",
+        "2023-07-01T12:59:08.999232Z 0 [Note] [MY-000000] [Galera] avg cert interval 0",
+        "2023-07-01T12:59:08.999241Z 0 [Note] [MY-000000] [Galera] cert index size 0",
+        "2023-07-01T12:59:08.999285Z 0 [Note] [MY-000000] [Galera] Service thread queue flushed.",
+        "2023-07-01T12:59:08.999323Z 0 [Note] [MY-000000] [Galera] wsdb trx map usage 0 conn query map usage 0",
+        "2023-07-01T12:59:08.999338Z 0 [Note] [MY-000000] [Galera] MemPool(LocalTrxHandle): hit ratio: 0, misses: 0, in use: 0, in pool: 0",
+        "2023-07-01T12:59:08.999835Z 0 [Note] [MY-000000] [Galera] Flushing memory map to disk...",
+        "2023-07-01T12:59:09.000170Z 0 [Note] [MY-000000] [WSREP] Waiting for active wsrep applier to exit",
+        "2023-07-01T12:59:09.000191Z 0 [Note] [MY-000000] [WSREP] All applier thread terminated. Will now terminate rollback thread",
+        "2023-07-01T12:59:09.000205Z 0 [Note] [MY-000000] [WSREP] Rollback thread terminated",
+        "2023-07-01T12:59:09.000213Z 0 [Note] [MY-000000] [WSREP] Service disconnected.",
+        "2023-07-01T12:59:09.000220Z 0 [Note] [MY-000000] [WSREP] Waiting to close threads......",
+        "2023-07-01T12:59:14.000404Z 0 [Note] [MY-000000] [WSREP] Some threads may fail to exit.",
+        "2023-07-01T12:59:14.000757Z 0 [Note] [MY-000000] [WSREP] Received shutdown signal. Will sleep for 10 secs before initiating shutdown. pxc_maint_mode switched to SHUTDOWN",
+        "2023-07-01T12:59:25.244237Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.32-24.2)  Percona XtraDB Cluster (GPL), Release rel24, Revision 2119e75, WSREP version 26.1.4.3."
+    ]
+}
+ok: [192.168.1.223] => {
+    "logs['stdout_lines']": [
+        "2023-07-01T12:59:21.173333Z 0 [Note] [MY-000000] [Galera] apply mon: entered 0",
+        "2023-07-01T12:59:21.175659Z 0 [Note] [MY-000000] [Galera] mon: entered 3 oooe fraction 0 oool fraction 0",
+        "2023-07-01T12:59:21.175682Z 0 [Note] [MY-000000] [Galera] cert index usage at exit 0",
+        "2023-07-01T12:59:21.175691Z 0 [Note] [MY-000000] [Galera] cert trx map usage at exit 0",
+        "2023-07-01T12:59:21.175700Z 0 [Note] [MY-000000] [Galera] deps set usage at exit 0",
+        "2023-07-01T12:59:21.175710Z 0 [Note] [MY-000000] [Galera] avg deps dist 0",
+        "2023-07-01T12:59:21.175720Z 0 [Note] [MY-000000] [Galera] avg cert interval 0",
+        "2023-07-01T12:59:21.175729Z 0 [Note] [MY-000000] [Galera] cert index size 0",
+        "2023-07-01T12:59:21.175769Z 0 [Note] [MY-000000] [Galera] Service thread queue flushed.",
+        "2023-07-01T12:59:21.175799Z 0 [Note] [MY-000000] [Galera] wsdb trx map usage 0 conn query map usage 0",
+        "2023-07-01T12:59:21.175812Z 0 [Note] [MY-000000] [Galera] MemPool(LocalTrxHandle): hit ratio: 0, misses: 0, in use: 0, in pool: 0",
+        "2023-07-01T12:59:21.176300Z 0 [Note] [MY-000000] [Galera] Flushing memory map to disk...",
+        "2023-07-01T12:59:21.176682Z 0 [Note] [MY-000000] [WSREP] Waiting for active wsrep applier to exit",
+        "2023-07-01T12:59:21.176700Z 0 [Note] [MY-000000] [WSREP] All applier thread terminated. Will now terminate rollback thread",
+        "2023-07-01T12:59:21.176710Z 0 [Note] [MY-000000] [WSREP] Rollback thread terminated",
+        "2023-07-01T12:59:21.176717Z 0 [Note] [MY-000000] [WSREP] Service disconnected.",
+        "2023-07-01T12:59:21.176725Z 0 [Note] [MY-000000] [WSREP] Waiting to close threads......",
+        "2023-07-01T12:59:26.176877Z 0 [Note] [MY-000000] [WSREP] Some threads may fail to exit.",
+        "2023-07-01T12:59:26.177203Z 0 [Note] [MY-000000] [WSREP] Received shutdown signal. Will sleep for 10 secs before initiating shutdown. pxc_maint_mode switched to SHUTDOWN",
+        "2023-07-01T12:59:37.440449Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.32-24.2)  Percona XtraDB Cluster (GPL), Release rel24, Revision 2119e75, WSREP version 26.1.4.3."
+    ]
+}
+
+TASK [common : start the rest of the servers] **********************************
+skipping: [192.168.1.221]
+changed: [192.168.1.223]
+changed: [192.168.1.222]
+
+TASK [common : Fetch client CERTs] *********************************************
+changed: [192.168.1.221] => (item=ca.pem)
+changed: [192.168.1.221] => (item=client-cert.pem)
+changed: [192.168.1.221] => (item=client-key.pem)
+
+PLAY RECAP *********************************************************************
+192.168.1.221              : ok=24   changed=16   unreachable=0    failed=0    skipped=4    rescued=0    ignored=0   
+192.168.1.222              : ok=22   changed=15   unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
+192.168.1.223              : ok=22   changed=15   unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
+
