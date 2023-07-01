@@ -1,3 +1,4 @@
+---
 # INSTALLING XTRADB CLUSTER
 - name: Install necessary packages
   ansible.builtin.apt:
@@ -7,34 +8,29 @@
       - gnupg2
       - lsb-release
       - curl
+      - rsync
     state: present
 
 
-- name: Download the repository package
-  ansible.builtin.shell:
-    cmd: | 
-      wget -P /tmp/ https://repo.percona.com/apt/percona-release_latest.generic_all.deb
-
-
-- name: download the percona xtradb repository deb package
+- name: Download the percona xtradb repository deb package
   get_url:
     url: https://repo.percona.com/apt/percona-release_latest.generic_all.deb
     dest: /tmp/percona-release_latest.generic_all.deb
     mode: 644
 
-  
+
 - name: Install the package
   ansible.builtin.apt:
     deb: /tmp/percona-release_latest.generic_all.deb
 
 
-- name: Refresh the local cache to update the package information
+- name: Update apt repository
   register: sysupdate
   ansible.builtin.apt:
     update_cache: true
 
 
-- name: Display the last line of the previous task to check the stats
+- name: Display previous output to check the stats
   ansible.builtin.debug:
     msg: "{{ sysupdate }}"
 
@@ -49,78 +45,100 @@
     name:
       - percona-xtradb-cluster
     state: present
+    update_cache: true
 
 
-- name: Create a directory for certs if it does not exist
+- name: Create a directory for CERTs if it does not exist
   file:
     path: /etc/mysql/certs/
     state: directory
     owner: mysql
     group: mysql 
-    mode: '0777'
+    mode: '0500'
 
 
-- name: Compress directory /path/to/foo/ into /path/to/foo.tgz
+- name: Compress CERTs for sending them to other nodes
   archive:
     path: /var/lib/mysql/*.pem
     dest: /etc/mysql/certs/certs.tar
-   
-
-- name: Fetch the file from the first node
-  run_once: true
-  fetch: src=/etc/mysql/certs/certs.tar dest=buffer/ flat=yes
   when: inventory_hostname == groups['all'][0]
 
 
-- name: Copy the file from to other nodes
-  copy: src=buffer/certs.tar dest=/etc/mysql/certs/
-  when: inventory_hostname != groups['all'][0]
+- name: Copy the certs securly via Synchronize
+  tags: sync-push
+  synchronize:
+      src: "{{ item }}"
+      dest: "{{ item }}"
+      mode: push
+  delegate_to: "{{groups['all'][0]}}"
+  register: syncfile
+  with_items:
+      - /etc/mysql/certs/certs.tar
+  
+
+# NOT SECURE
+#- name: Fetch the file from the first node
+#  run_once: true
+#  fetch: src=/etc/mysql/certs/certs.tar dest=buffer/ flat=yes
+#  when: inventory_hostname == groups['all'][0]
 
 
-- name: Unarchive a file that is already on the remote machine
+#- name: Copy the file to other nodes
+#  copy: src=buffer/certs.tar dest=/etc/mysql/certs/
+#  when: inventory_hostname != groups['all'][0]
+
+
+- name: Unarchive CERTs archive
   unarchive:
     src: /etc/mysql/certs/certs.tar
     dest: /etc/mysql/certs/
     remote_src: yes
   
 
-- name: Set files permissions
+- name: Set permissions
   file:
     path: /etc/mysql/certs/
     state: directory
     recurse: true
     owner: mysql
     group: mysql
-    mode: 0777
+    mode: 0740  #740
   
-- name: generate id for server
+
+- name: Generate id for server
   set_fact:
     id : "{{ ansible_nodename[-1] }}"
+
 
 - debug:
     var: ansible_nodename[-1]
 
-- name: generate configuration file from template
+
+- name: Generate configuration file from template
   template:
     src: mysqld.cnf.j2
     dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+
 
 - name: Stop mysql servers
   systemd:
     name: mysql
     state: stopped
     
-- name: bootstrap mysql on the first node
+
+- name: Bootstrap mysql on the first node
   systemd:
     name: mysql@bootstrap
     state: started
   when: inventory_hostname == groups['all'][0]
   ignore_errors: true
 
+
 - name: Get errors logs
   ansible.builtin.shell:
     cmd: tail -n 20 /var/log/mysql/error.log
   register: logs
+
 
 - debug:
     var: logs['stdout_lines']
@@ -131,6 +149,15 @@
     name: mysql
     state: started
   when: inventory_hostname != groups['all'][0]
+  ignore_errors: true # Remove it
+
+
+- name: Fetch client CERTs
+  run_once: true
+  fetch: src=/etc/mysql/certs/{{ item }} dest=files/ flat=yes
+  loop:
+    - ca.pem
+    - client-cert.pem
+    - client-key.pem
+  when: inventory_hostname == groups['all'][0]
   
-
-

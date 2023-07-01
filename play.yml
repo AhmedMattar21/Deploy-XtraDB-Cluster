@@ -1,7 +1,45 @@
 ---
-  - name: XtraDB Cluster
-    hosts: all
-    become: true
-    become_user: root
-    roles:
-      - common
+- name: XtraDB Cluster
+  hosts: all
+  become: true
+  become_user: root
+  pre_tasks:
+
+    - name: Check if the key exists
+      ansible.builtin.stat:
+        path: ~/.ssh/id_rsa.pub
+      register: key
+
+    - name: Task name
+      ansible.builtin.shell:
+        cmd: rm -f ~/.ssh/id_rsa*
+      when: key.stat.exists
+
+    - name: Generate SSH key for the first node
+      ansible.builtin.shell: |
+        ssh-keygen -b 2048 -t rsa -C 'SSH Key' -f ~/.ssh/id_rsa -P ''
+      when: inventory_hostname == groups['all'][0]
+      register: outputssh
+
+
+    - name: Fetch Public key to the master
+      ansible.builtin.fetch:
+        src: "~/.ssh/id_rsa.pub"
+        dest: "buffer/id_rsa.pub"
+        flat: yes
+      when: inventory_hostname == groups['all'][0]
+
+
+    - name: Copy the file from master to destination
+      copy: src=buffer/id_rsa.pub dest=/tmp/remote-id_rsa.pub
+      when: inventory_hostname != groups['all'][0]
+
+
+    - name: add the public key into Authorized_keys file to enable Key Auth
+      shell: "cat /tmp/remote-id_rsa.pub >> ~/.ssh/authorized_keys"
+      when: inventory_hostname != groups['all'][0]
+      register: addtoauth
+
+
+  roles:
+    - common

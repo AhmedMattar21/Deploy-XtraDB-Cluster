@@ -13,7 +13,15 @@
           - gnupg2
           - lsb-release
           - curl
+          - rsync
         state: present
+
+    - name: Install RSYNC packages
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - rsync
+        state: latest
 
   
     - name: Download the repository package
